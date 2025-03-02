@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apoie nosso serviço</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            background-color: #1e1e1e;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2em;
+        }
+        h2 {
+            font-size: 1.5em;
+        }
+        .content {
+            margin-top: 30px;
+        }
+        .buttons-container {
+            margin-top: 20px;
+        }
+        button {
+            padding: 15px;
+            font-size: 1.2em;
+            margin: 5px;
+            background-color: #00bfff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0099cc;
+        }
+        #pixCodeContainer {
+            margin-top: 30px;
+            display: none;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        #pixCode {
+            font-family: monospace;
+            color: #00bfff;
+            background-color: #222;
+            padding: 10px;
+            border-radius: 5px;
+            word-wrap: break-word;
+            margin: 20px 0;
+            display: inline-block;
+        }
+        .copy-btn {
+            background-color: #ff4500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .copy-btn:hover {
+            background-color: #e03e00;
+        }
+        #message {
+            display: none;
+            margin-top: 30px;
+            background-color: #4caf50;
+            padding: 20px;
+            font-size: 1.3em;
+            color: #fff;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Apoie nosso serviço</h1>
+        <h2>Faça sua doação e ajude-nos a continuar com o nosso trabalho!</h2>
+    </header>
+
+    <div class="content">
+        <h3>Escolha o valor da doação:</h3>
+        <div class="buttons-container">
+            <button onclick="generatePixCode(5)">R$ 5,00</button>
+            <button onclick="generatePixCode(10)">R$ 10,00</button>
+            <button onclick="generatePixCode(15)">R$ 15,00</button>
+            <button onclick="generatePixCode(20)">R$ 20,00</button>
+            <button onclick="generatePixCode('outro')">Outro valor</button>
+        </div>
+
+        <div id="pixCodeContainer">
+            <h3>Código Pix:</h3>
+            <p id="pixCode"></p>
+            <button class="copy-btn" onclick="copyPixCode()">Copiar Código</button>
+        </div>
+
+        <div id="message"></div>
+    </div>
+
+    <script>
+        function generatePixCode(value) {
+            fetch('/generate_pix_code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ value: value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.pix_code) {
+                    document.getElementById('pixCode').innerText = data.pix_code;
+                    document.getElementById('pixCodeContainer').style.display = 'block';
+                    showThankYouMessage();
+                } else {
+                    alert("Erro ao gerar o código Pix.");
+                }
+            })
+            .catch(error => {
+                alert("Erro ao gerar o código Pix. Tente novamente.");
+            });
+        }
+
+        function copyPixCode() {
+            const pixCode = document.getElementById('pixCode');
+            const textArea = document.createElement("textarea");
+            textArea.value = pixCode.innerText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            alert("Código Pix copiado com sucesso!");
+        }
+
+        function showThankYouMessage() {
+            const message = document.getElementById('message');
+            message.innerHTML = 'Agradecemos pela sua doação! Sua contribuição nos ajuda a continuar melhorando nossos serviços. Muito obrigado!';
+            message.style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
